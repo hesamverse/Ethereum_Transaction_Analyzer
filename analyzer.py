@@ -10,6 +10,7 @@ from rich.table import Table
 from utils import convert_timestamp
 from utils import plot_gas_usage
 from utils import plot_top_interactions
+import argparse
 
 ETHERSCAN_BASE_URL = "https://api.etherscan.io/api"
 
@@ -33,6 +34,15 @@ def fetch_transactions(address):
         return []
 
     return data["result"]
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="🔍 Ethereum Transaction Analyzer")
+    parser.add_argument("address", help="Ethereum address to analyze")
+    parser.add_argument("--limit", type=int, default=10, help="Number of transactions to display")
+    parser.add_argument("--no-gas-graph", action="store_true", help="Disable gas usage graph")
+    parser.add_argument("--no-pie", action="store_true", help="Disable interaction pie chart")
+    return parser.parse_args()
+
 
 def analyze_transactions(transactions):
     """Analyzes the total and average gas usage and the most interacted address."""
@@ -77,11 +87,14 @@ def display_table(transactions):
 
 if __name__ == "__main__":
     address = input("🧾 Enter Ethereum address: ").strip()
+    args = parse_arguments()
+    address = args.address
     transactions = fetch_transactions(address)
-    if transactions:
-        analyze_transactions(transactions)
-        display_table(transactions)
-        plot_gas_usage(transactions)
-        plot_top_interactions(transactions)
 
-    console.print(table)
+    if transactions:
+            analyze_transactions(transactions)
+            display_table(transactions[:args.limit])
+            if not args.no_gas_graph:
+                plot_gas_usage(transactions)
+            if not args.no_pie:
+                plot_top_interactions(transactions)
