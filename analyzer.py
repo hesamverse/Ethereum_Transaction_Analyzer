@@ -5,6 +5,9 @@ import requests
 from tabulate import tabulate
 from config import ETHERSCAN_API_KEY
 from utils import convert_timestamp
+from rich.console import Console
+from rich.table import Table
+from utils import convert_timestamp
 
 ETHERSCAN_BASE_URL = "https://api.etherscan.io/api"
 
@@ -50,19 +53,26 @@ def analyze_transactions(transactions):
     print(f"🤝 Most Interacted Address: {top_contact} ({interaction_count.get(top_contact, 0)} times)")
 
 def display_table(transactions):
-    """Displays a table of the first 10 transactions."""
-    table_data = []
+    """Displays a styled table of the first 10 transactions using rich."""
+    console = Console()
+    table = Table(title="📄 Recent Ethereum Transactions", style="cyan")
+
+    table.add_column("TxHash", style="bold magenta")
+    table.add_column("From", style="dim")
+    table.add_column("To", style="dim")
+    table.add_column("GasUsed", justify="right", style="yellow")
+    table.add_column("Date", style="green")
+
     for tx in transactions[:10]:
-        table_data.append([
+        table.add_row(
             tx["hash"][:10] + "...",
             tx["from"][:10] + "...",
             tx["to"][:10] + "...",
-            int(tx["gasUsed"]),
+            f"{int(tx['gasUsed']):,}",
             convert_timestamp(tx["timeStamp"])
-        ])
+        )
 
-    headers = ["TxHash", "From", "To", "GasUsed", "Timestamp"]
-    print(tabulate(table_data, headers=headers, tablefmt="fancy_grid"))
+    console.print(table)
 
 if __name__ == "__main__":
     address = input("🧾 Enter Ethereum address: ").strip()
