@@ -3,6 +3,34 @@
 
 from datetime import datetime
 import matplotlib.pyplot as plt
+import requests
+from config import ETHERSCAN_API_KEY
+
+ETHERSCAN_BASE_URL = "https://api.etherscan.io/api"
+
+def fetch_transactions(address):
+    """
+    Fetches transaction history for a given Ethereum address from Etherscan.
+    """
+    params = {
+        "module": "account",
+        "action": "txlist",
+        "address": address,
+        "startblock": 0,
+        "endblock": 99999999,
+        "sort": "asc",
+        "apikey": ETHERSCAN_API_KEY
+    }
+
+    response = requests.get(ETHERSCAN_BASE_URL, params=params)
+    data = response.json()
+
+    if data["status"] != "1":
+        print("❌ Failed to fetch transactions:", data["message"])
+        return []
+
+    return data["result"]
+
 
 def convert_timestamp(unix_timestamp):
     """
