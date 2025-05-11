@@ -49,3 +49,40 @@ def plot_gas_usage(transactions):
     plt.tight_layout()
     plt.grid(True)
     plt.show()
+
+def plot_top_interactions(transactions, top_n=5):
+    """
+    Plots a pie chart of the top N most interacted 'to' addresses.
+    """
+    from collections import Counter
+    import matplotlib.pyplot as plt
+
+    if not transactions:
+        print("⚠️ No transactions to plot.")
+        return
+
+    interaction_counter = Counter()
+
+    for tx in transactions:
+        to_address = tx["to"]
+        if to_address:
+            interaction_counter[to_address] += 1
+
+    # Get N most frequent addresses
+    most_common = interaction_counter.most_common(top_n)
+    labels = [item[0][:8] + "..." for item in most_common]
+    counts = [item[1] for item in most_common]
+
+    # Add "Other" category (lesser interactions)
+    others_count = sum(interaction_counter.values()) - sum(counts)
+    if others_count > 0:
+        labels.append("Others")
+        counts.append(others_count)
+
+    # Draw a chart
+    plt.figure(figsize=(8, 8))
+    plt.pie(counts, labels=labels, autopct="%1.1f%%", startangle=140)
+    plt.title("🤝 Interaction Distribution")
+    plt.axis("equal")
+    plt.tight_layout()
+    plt.show()
