@@ -4,6 +4,7 @@
 import requests
 from tabulate import tabulate
 from config import ETHERSCAN_API_KEY
+from utils import convert_timestamp
 
 ETHERSCAN_BASE_URL = "https://api.etherscan.io/api"
 
@@ -57,7 +58,7 @@ def display_table(transactions):
             tx["from"][:10] + "...",
             tx["to"][:10] + "...",
             int(tx["gasUsed"]),
-            tx["timeStamp"]
+            convert_timestamp(tx["timeStamp"])
         ])
 
     headers = ["TxHash", "From", "To", "GasUsed", "Timestamp"]
