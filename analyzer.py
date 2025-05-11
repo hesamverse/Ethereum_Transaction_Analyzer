@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 from utils import convert_timestamp
 from utils import plot_gas_usage
+from utils import plot_top_interactions
 
 ETHERSCAN_BASE_URL = "https://api.etherscan.io/api"
 
@@ -72,13 +73,7 @@ def display_table(transactions):
             f"{int(tx['gasUsed']):,}",
             convert_timestamp(tx["timeStamp"])
         )
-    
-    if transactions:
-        analyze_transactions(transactions)
-        display_table(transactions)
-        plot_gas_usage(transactions)
 
-    console.print(table)
 
 if __name__ == "__main__":
     address = input("🧾 Enter Ethereum address: ").strip()
@@ -86,3 +81,7 @@ if __name__ == "__main__":
     if transactions:
         analyze_transactions(transactions)
         display_table(transactions)
+        plot_gas_usage(transactions)
+        plot_top_interactions(transactions)
+
+    console.print(table)
